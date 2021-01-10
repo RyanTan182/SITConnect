@@ -46,10 +46,11 @@ namespace SITConnect
                     byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
                     string userHash = Convert.ToBase64String(hashWithSalt);
                     if (userHash.Equals(dbHash))
-                    {
+                    { 
                         if (dbstatus=="Open")
                         {
                             Session["LoggedIn"] = tb_email.Text.Trim();
+                            Session["SSEmail"] = tb_email.Text;
 
                             string guid = Guid.NewGuid().ToString();
                             Session["AuthToken"] = guid;
@@ -60,7 +61,6 @@ namespace SITConnect
                         if (dbstatus == "Locked")
                         {
                             errorMsg.Text = "Your Accouunt has been locked out due to many failed login attempts just now. Please contact adminstrator.";
-                            Response.Redirect("Login.aspx", false);
                         }
                     }
                     //else if (attemptcount == 3)
@@ -76,7 +76,6 @@ namespace SITConnect
                     //    errorMsg.Visible = true;
                     //    errorMsg.Text = "Invalid Login Attempt.";
                     //}
-                    
                 }
             }
             catch (Exception ex)

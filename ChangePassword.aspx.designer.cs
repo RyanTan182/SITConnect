@@ -11,7 +11,7 @@ namespace SITConnect
 {
 
 
-    public partial class HomePage
+    public partial class ChangePassword
     {
 
         /// <summary>
@@ -24,30 +24,57 @@ namespace SITConnect
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
-        /// lblMsg control.
+        /// lbl_email control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblMsg;
+        protected global::System.Web.UI.WebControls.Label lbl_email;
 
         /// <summary>
-        /// btn_logout control.
+        /// tb_newpassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_logout;
+        protected global::System.Web.UI.WebControls.TextBox tb_newpassword;
 
         /// <summary>
-        /// btn_edit control.
+        /// lbl_pwdchecker control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_edit;
+        protected global::System.Web.UI.WebControls.Label lbl_pwdchecker;
+
+        /// <summary>
+        /// tb_newconfirmpassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_newconfirmpassword;
+
+        /// <summary>
+        /// btn_submit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button btn_submit;
+
+        /// <summary>
+        /// errorMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label errorMsg;
     }
 }

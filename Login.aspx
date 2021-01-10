@@ -34,7 +34,7 @@
             <tr>
                 <td class="auto-style2">Email Address:</td>
                 <td class="auto-style1">
-                    <asp:TextBox ID="tb_email" runat="server" Width="211px"></asp:TextBox>
+                    <asp:TextBox ID="tb_email" runat="server" Width="211px" TextMode="Email"></asp:TextBox>
                 </td>
                 <td>
                     &nbsp;</td>

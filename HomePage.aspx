@@ -55,7 +55,9 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style2">
+                    <asp:Button ID="btn_edit" runat="server" Text="Change Password" Width="222px" OnClick="EditPassword" />
+                </td>
                 <td class="auto-style1">
                     &nbsp;</td>
                 <td>

@@ -71,6 +71,7 @@
     <Content Include="App_Data\SITConnect_log.ldf">
       <DependentUpon>SITConnect.mdf</DependentUpon>
     </Content>
+    <Content Include="ChangePassword.aspx" />
     <Content Include="Global.asax" />
     <Content Include="HomePage.aspx" />
     <Content Include="Login.aspx" />
@@ -78,6 +79,13 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChangePassword.aspx.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ChangePassword.aspx.designer.cs">
+      <DependentUpon>ChangePassword.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
