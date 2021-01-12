@@ -18,7 +18,8 @@ namespace SITConnect
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
 
         static string finalHash;
-        static string accountstatus;
+        static int failedattemptcount;
+        static Nullable<DateTime> lastfailedattempt;
         static string salt;
         byte[] Key;
         byte[] IV;
@@ -73,7 +74,8 @@ namespace SITConnect
             cipher.GenerateKey();
             Key = cipher.Key;
             IV = cipher.IV;
-            accountstatus = "Open";
+            failedattemptcount = 0;
+            lastfailedattempt = null;
             createAccount();
             Response.Redirect("Login.aspx");
         }
@@ -118,7 +120,7 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @Status)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @LastFailedAttempt)"))
                 {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
@@ -132,7 +134,8 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@DateOfBirth", tb_dob.Text.Trim());
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(IV));
                             cmd.Parameters.AddWithValue("@Key", Convert.ToBase64String(Key));
-                            cmd.Parameters.AddWithValue("@Status",accountstatus);
+                            cmd.Parameters.AddWithValue("@FailedAttemptCount", failedattemptcount);
+                            cmd.Parameters.AddWithValue("@LastFailedAttempt", DBNull.Value);
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();
