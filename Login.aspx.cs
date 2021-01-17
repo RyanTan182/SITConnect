@@ -38,6 +38,7 @@ namespace SITConnect
             string dbHash = getDBHash(userid);
             string dbSalt = getDBSalt(userid);
             int dbcount = getFailedAttemptCount(userid);
+            int updatecount = updateFailedAttemptCount(userid);
             try
             {
                 if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
@@ -46,8 +47,8 @@ namespace SITConnect
                     byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
                     string userHash = Convert.ToBase64String(hashWithSalt);
                     if (userHash.Equals(dbHash))
-                    { 
-                        if (dbcount <3)
+                    {
+                        if (dbcount < 3)
                         {
                             Session["LoggedIn"] = tb_email.Text.Trim();
                             Session["SSEmail"] = tb_email.Text;
@@ -58,10 +59,18 @@ namespace SITConnect
                             Response.Cookies.Add(new HttpCookie("AuthToken", guid));
                             Response.Redirect("HomePage.aspx", false);
                         }
-                        if (dbcount ==3 && dbcount >=3)
+                        else if (dbcount >= 3)
                         {
-                            errorMsg.Text = "Your Accouunt has been locked out due to many failed login attempts just now. Please contact adminstrator.";
+                            errorMsg.Visible = true;
+                            errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please contact adminstrator.";
                         }
+                }
+                    else
+                    {
+                        errorMsg.Visible = true;
+                        errorMsg.Text = "Login Failed!";
+                        updatecount += 1;
+
                     }
                 }
             }
@@ -149,6 +158,7 @@ namespace SITConnect
             finally { connection.Close(); }
             return h;
         }
+
         protected string getDBSalt(string email)
         {
             string s = null;
@@ -212,17 +222,19 @@ namespace SITConnect
             return g;
         }
 
-        private void setLockStatus(string email)
+        protected int updateFailedAttemptCount(string email)
         {
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
-            string sql = "Update Account SET Status='Locked' WHERE Email=@EMAIL";
+            string sql = "Update Account SET FailedAttemptCount=FailedAttemptCount + 1 WHERE Email=@EMAIL";
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@EMAIL", email);
+            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
             connection.Open();
             command.CommandText = sql;
             command.Connection = connection;
-            command.ExecuteNonQuery();
+            int result=command.ExecuteNonQuery();
             connection.Close();
+            return result;
         }
 
         protected void btn_register_Click(object sender, EventArgs e)
