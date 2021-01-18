@@ -20,6 +20,7 @@ namespace SITConnect
         static string finalHash;
         static int failedattemptcount;
         static Nullable<DateTime> lastfailedattempt;
+        static Nullable<DateTime> lastupdatepassword;
         static string salt;
         byte[] Key;
         byte[] IV;
@@ -76,6 +77,7 @@ namespace SITConnect
             IV = cipher.IV;
             failedattemptcount = 0;
             lastfailedattempt = null;
+            lastupdatepassword = null;
             createAccount();
             Response.Redirect("Login.aspx");
         }
@@ -120,7 +122,7 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @LastFailedAttempt)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @LastFailedAttempt, @LastUpdatePassword)"))
                 {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
@@ -136,6 +138,7 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@Key", Convert.ToBase64String(Key));
                             cmd.Parameters.AddWithValue("@FailedAttemptCount", failedattemptcount);
                             cmd.Parameters.AddWithValue("@LastFailedAttempt", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@LastUpdatePassword", DBNull.Value);
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();

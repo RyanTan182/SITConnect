@@ -18,6 +18,7 @@ namespace SITConnect
     {
         static String lockStatus;
         static int attemptcount = 0;
+        string lastfailedattempt = DateTime.Now.ToString();
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
         public class MyObject
         {
@@ -38,6 +39,7 @@ namespace SITConnect
             string dbHash = getDBHash(userid);
             string dbSalt = getDBSalt(userid);
             int dbcount = getFailedAttemptCount(userid);
+            int updatefailedattempt = updateLastFailedAttempt(userid, lastfailedattempt);
             int updatecount = updateFailedAttemptCount(userid);
             try
             {
@@ -56,6 +58,7 @@ namespace SITConnect
                             string guid = Guid.NewGuid().ToString();
                             Session["AuthToken"] = guid;
 
+                            updatecount = 0;
                             Response.Cookies.Add(new HttpCookie("AuthToken", guid));
                             Response.Redirect("HomePage.aspx", false);
                         }
@@ -69,6 +72,7 @@ namespace SITConnect
                     {
                         errorMsg.Visible = true;
                         errorMsg.Text = "Login Failed!";
+                        updatefailedattempt += 1;
                         updatecount += 1;
 
                     }
@@ -233,6 +237,22 @@ namespace SITConnect
             command.CommandText = sql;
             command.Connection = connection;
             int result=command.ExecuteNonQuery();
+            connection.Close();
+            return result;
+        }
+
+        protected int updateLastFailedAttempt(string email,string lastfailedattempt)
+        {
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "Update Account SET LastFailedAttempt=@paraLastFailedAttempt WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.Parameters.AddWithValue("@paraLastFailedAttempt", lastfailedattempt);
+            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            connection.Open();
+            command.CommandText = sql;
+            command.Connection = connection;
+            int result = command.ExecuteNonQuery();
             connection.Close();
             return result;
         }

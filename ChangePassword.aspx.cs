@@ -17,6 +17,7 @@ namespace SITConnect
     {
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
         static string newfinalHash;
+        string lastupdatepassword = DateTime.Now.ToString();
         static string newsalt;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -89,6 +90,7 @@ namespace SITConnect
         protected void btn_submit_Click(object sender, EventArgs e)
         {
             int scores = checkPassword(tb_newpassword.Text);
+    
             string status = "";
             switch (scores)
             {
@@ -128,7 +130,24 @@ namespace SITConnect
             byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
             newfinalHash = Convert.ToBase64String(hashWithSalt);
             UpdatePassword();
+            updateLastUpdatePassword(lbl_email.Text, lastupdatepassword);
             Response.Redirect("HomePage.aspx");
+        }
+
+        protected int updateLastUpdatePassword(string email, string lastupdatepassword)
+        {
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "Update Account SET LastUpdatePassword=@paraLastUpdatePassword WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.Parameters.AddWithValue("@paraLastUpdatePassword", lastupdatepassword);
+            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            connection.Open();
+            command.CommandText = sql;
+            command.Connection = connection;
+            int result = command.ExecuteNonQuery();
+            connection.Close();
+            return result;
         }
     }
 }

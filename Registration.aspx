@@ -23,7 +23,7 @@
                 document.getElementById("lbl_pwdchecker").innerHTML = "Password require at least 1 Capital Letter";
                 document.getElementById("lbl_pwdchecker").style.color = "Red";
                 return ("no_capital");
-            }
+            }   
             else if (str.search(/[a-z]/) == -1) {
                 document.getElementById("lbl_pwdchecker").innerHTML = "Password require at least 1 Lowercase Letter";
                 document.getElementById("lbl_pwdchecker").style.color = "Red";
