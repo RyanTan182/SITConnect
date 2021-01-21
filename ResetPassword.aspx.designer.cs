@@ -11,7 +11,7 @@ namespace SITConnect
 {
 
 
-    public partial class Login
+    public partial class ResetPassword
     {
 
         /// <summary>
@@ -24,22 +24,40 @@ namespace SITConnect
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
-        /// tb_email control.
+        /// lbl_email control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox tb_email;
+        protected global::System.Web.UI.WebControls.Label lbl_email;
 
         /// <summary>
-        /// tb_password control.
+        /// tb_newpassword control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox tb_password;
+        protected global::System.Web.UI.WebControls.TextBox tb_newpassword;
+
+        /// <summary>
+        /// lbl_pwdchecker control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lbl_pwdchecker;
+
+        /// <summary>
+        /// tb_newconfirmpassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox tb_newconfirmpassword;
 
         /// <summary>
         /// btn_submit control.
@@ -51,24 +69,6 @@ namespace SITConnect
         protected global::System.Web.UI.WebControls.Button btn_submit;
 
         /// <summary>
-        /// btn_register control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_register;
-
-        /// <summary>
-        /// btn_forgotpassword control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_forgotpassword;
-
-        /// <summary>
         /// errorMsg control.
         /// </summary>
         /// <remarks>
@@ -76,14 +76,5 @@ namespace SITConnect
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label errorMsg;
-
-        /// <summary>
-        /// lbl_gScore control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lbl_gScore;
     }
 }

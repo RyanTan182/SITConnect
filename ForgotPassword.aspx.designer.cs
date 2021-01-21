@@ -11,7 +11,7 @@ namespace SITConnect
 {
 
 
-    public partial class Login
+    public partial class ForgotPassword
     {
 
         /// <summary>
@@ -33,15 +33,6 @@ namespace SITConnect
         protected global::System.Web.UI.WebControls.TextBox tb_email;
 
         /// <summary>
-        /// tb_password control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox tb_password;
-
-        /// <summary>
         /// btn_submit control.
         /// </summary>
         /// <remarks>
@@ -51,24 +42,6 @@ namespace SITConnect
         protected global::System.Web.UI.WebControls.Button btn_submit;
 
         /// <summary>
-        /// btn_register control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_register;
-
-        /// <summary>
-        /// btn_forgotpassword control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btn_forgotpassword;
-
-        /// <summary>
         /// errorMsg control.
         /// </summary>
         /// <remarks>
@@ -76,14 +49,5 @@ namespace SITConnect
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label errorMsg;
-
-        /// <summary>
-        /// lbl_gScore control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lbl_gScore;
     }
 }

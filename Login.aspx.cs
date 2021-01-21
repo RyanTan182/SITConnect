@@ -277,5 +277,10 @@ namespace SITConnect
         {
             Response.Redirect("Registration.aspx");
         }
+
+        protected void btn_forgot_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ForgotPassword.aspx");
+        }
     }
 }
