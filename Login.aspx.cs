@@ -58,7 +58,7 @@ namespace SITConnect
                             string guid = Guid.NewGuid().ToString();
                             Session["AuthToken"] = guid;
 
-                            updatecount = 0;
+                            resetFailedAttemptCount(userid);
                             Response.Cookies.Add(new HttpCookie("AuthToken", guid));
                             Response.Redirect("HomePage.aspx", false);
                         }
@@ -237,6 +237,22 @@ namespace SITConnect
             command.CommandText = sql;
             command.Connection = connection;
             int result=command.ExecuteNonQuery();
+            connection.Close();
+            return result;
+        }
+
+        protected int resetFailedAttemptCount(string email)
+        {
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "Update Account SET FailedAttemptCount=@paraFailedAttemptCount WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.Parameters.AddWithValue("@paraFailedAttemptCount",0);
+            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            connection.Open();
+            command.CommandText = sql;
+            command.Connection = connection;
+            int result = command.ExecuteNonQuery();
             connection.Close();
             return result;
         }
