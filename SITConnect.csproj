@@ -72,6 +72,9 @@
       <DependentUpon>SITConnect.mdf</DependentUpon>
     </Content>
     <Content Include="ChangePassword.aspx" />
+    <Content Include="CustomError\GenericError.html" />
+    <Content Include="CustomError\HTTP404.html" />
+    <Content Include="CustomError\HTTP500.html" />
     <Content Include="Global.asax" />
     <Content Include="HomePage.aspx" />
     <Content Include="Login.aspx" />
