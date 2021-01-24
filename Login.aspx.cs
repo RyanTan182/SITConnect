@@ -53,7 +53,23 @@ namespace SITConnect
                             string pwdWithSalt = pwd + dbSalt;
                             byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
                             string userHash = Convert.ToBase64String(hashWithSalt);
-                            if (userHash.Equals(dbHash))
+                            if (dbcount == 3)
+                            {
+                                DateTime unlockedtime = Convert.ToDateTime(getDateTime(userid));
+                                if (DateTime.Now < unlockedtime)
+                                {
+                                    errorMsg.Visible = true;
+                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please refresh and try again later";
+                                }
+                                else if (DateTime.Now > unlockedtime)
+                                {
+                                    resetFailedAttemptCount(userid);
+                                    updateLoginTime(userid, DateTime.Now);
+                                    errorMsg.Visible = true;
+                                    errorMsg.Text = "Sorry for the wait! Your account has been automatically unlocked! Please try logging in again now";
+                                }
+                            }
+                            else if (userHash.Equals(dbHash))
                             {
                                 if (dbcount < 3)
                                 {
@@ -64,6 +80,7 @@ namespace SITConnect
                                     Session["AuthToken"] = guid;
 
                                     resetFailedAttemptCount(userid);
+                                    updateLoginTime(userid, DateTime.Now);
                                     Response.Cookies.Add(new HttpCookie("AuthToken", guid));
                                     Response.Redirect("HomePage.aspx", false);
                                 }
@@ -73,15 +90,28 @@ namespace SITConnect
                                     errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please contact adminstrator.";
                                 }
                             }
+                            else if (dbcount == 2)
+                            {
+                                int updatedattemptcount = dbcount + 1;
+                                updateLoginTime(userid, DateTime.Now.AddMinutes(1));
+                                updateFailedAttemptCount(userid, updatedattemptcount);
+
+                            }
                             else
                             {
                                 errorMsg.Visible = true;
                                 errorMsg.Text = "Login Failed!";
                                 dbcount += 1;
                                 updateFailedAttemptCount(userid, dbcount);
-
                             }
                         }
+                    }
+                    else
+                    {
+
+                        errorMsg.Visible = true;
+                        errorMsg.Text = "Login Failed!";
+
                     }
                 }
             }
@@ -295,7 +325,7 @@ namespace SITConnect
             return result;
         }
 
-        protected int updateLoginTime(string email,string updatelogintime)
+        protected int updateLoginTime(string email,DateTime updatelogintime)
         {
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
             string sql = "Update Account SET UpdateLoginTime=@paraUpdateLoginTime WHERE Email=@EMAIL";
@@ -308,6 +338,38 @@ namespace SITConnect
             int result = command.ExecuteNonQuery();
             connection.Close();
             return result;
+        }
+
+        protected string getDateTime(string email)
+        {
+            string s=null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select UpdateLoginTime FROM Account WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["UpdateLoginTime"] != null)
+                        {
+                            if (reader["UpdateLoginTime"] != DBNull.Value)
+                            {
+                                s =reader["UpdateLoginTime"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
         }
 
         protected void btn_register_Click(object sender, EventArgs e)

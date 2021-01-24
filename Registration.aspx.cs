@@ -124,7 +124,7 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @UpdateLoginTime, @UpdateMinPassword, @UpdateMaxPassword)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @IV, @Key, @DateOfBirth, @FailedAttemptCount, @UpdateLoginTime, @UpdateMinPassword, @UpdateMaxPassword)"))
                 {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
