@@ -59,7 +59,7 @@ namespace SITConnect
                                 if (DateTime.Now < unlockedtime)
                                 {
                                     errorMsg.Visible = true;
-                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please refresh and try again later";
+                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please refresh and try again in 15 minutes.";
                                 }
                                 else if (DateTime.Now > unlockedtime)
                                 {
@@ -93,7 +93,7 @@ namespace SITConnect
                             else if (dbcount == 2)
                             {
                                 int updatedattemptcount = dbcount + 1;
-                                updateLoginTime(userid, DateTime.Now.AddMinutes(1));
+                                updateLoginTime(userid, DateTime.Now.AddMinutes(15));
                                 updateFailedAttemptCount(userid, updatedattemptcount);
 
                             }
