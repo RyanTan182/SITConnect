@@ -140,8 +140,8 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@Key", Convert.ToBase64String(Key));
                             cmd.Parameters.AddWithValue("@FailedAttemptCount", failedattemptcount);
                             cmd.Parameters.AddWithValue("@UpdateLoginTime", DBNull.Value);
-                            cmd.Parameters.AddWithValue("@UpdateMinPassword", DBNull.Value);
-                            cmd.Parameters.AddWithValue("@UpdateMaxPassword", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@UpdateMinPassword", DateTime.Now.AddMinutes(5));
+                            cmd.Parameters.AddWithValue("@UpdateMaxPassword", DateTime.Now.AddMinutes(15));
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();

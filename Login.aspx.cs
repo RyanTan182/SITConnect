@@ -71,18 +71,38 @@ namespace SITConnect
                             }
                             else if (userHash.Equals(dbHash))
                             {
+                                DateTime minpassword= Convert.ToDateTime(getminPassword(userid));
+                                DateTime maxpassword= Convert.ToDateTime(getmaxPassword(userid));
                                 if (dbcount < 3)
                                 {
-                                    Session["LoggedIn"] = tb_email.Text.Trim();
-                                    Session["SSEmail"] = tb_email.Text;
+                                    if (DateTime.Now > maxpassword )
+                                    {
+                                        Session["LoggedIn"] = tb_email.Text.Trim();
+                                        Session["SSEmail"] = tb_email.Text;
 
-                                    string guid = Guid.NewGuid().ToString();
-                                    Session["AuthToken"] = guid;
+                                        string guid = Guid.NewGuid().ToString();
+                                        Session["AuthToken"] = guid;
 
-                                    resetFailedAttemptCount(userid);
-                                    updateLoginTime(userid, DateTime.Now);
-                                    Response.Cookies.Add(new HttpCookie("AuthToken", guid));
-                                    Response.Redirect("HomePage.aspx", false);
+                                        resetFailedAttemptCount(userid);
+                                        updateLoginTime(userid, DateTime.Now);
+
+                                        Response.Cookies.Add(new HttpCookie("AuthToken", guid));
+                                        Response.Redirect("ChangePassword.aspx", false);
+                                    }
+                                    else
+                                    {
+                                        Session["LoggedIn"] = tb_email.Text.Trim();
+                                        Session["SSEmail"] = tb_email.Text;
+
+                                        string guid = Guid.NewGuid().ToString();
+                                        Session["AuthToken"] = guid;
+
+                                        resetFailedAttemptCount(userid);
+                                        updateLoginTime(userid, DateTime.Now);
+
+                                        Response.Cookies.Add(new HttpCookie("AuthToken", guid));
+                                        Response.Redirect("HomePage.aspx", false);
+                                    }
                                 }
                                 else if (dbcount >= 3)
                                 {
@@ -359,6 +379,99 @@ namespace SITConnect
                             if (reader["UpdateLoginTime"] != DBNull.Value)
                             {
                                 s =reader["UpdateLoginTime"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
+        }
+        protected int updateminpassword(string email, DateTime updateminpassword)
+        {
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "Update Account SET UpdateMinPassword=@paraUpdateMinPassword WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.Parameters.AddWithValue("@paraUpdateMinPassword", updateminpassword);
+            connection.Open();
+            command.CommandText = sql;
+            command.Connection = connection;
+            int result = command.ExecuteNonQuery();
+            connection.Close();
+            return result;
+        }   
+
+        protected string getminPassword(string email)
+        {
+            string s = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select UpdateMinPassword FROM Account WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["UpdateMinPassword"] != null)
+                        {
+                            if (reader["UpdateMinPassword"] != DBNull.Value)
+                            {
+                                s = reader["UpdateMinPassword"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
+        }
+
+        protected int updatemaxpassword(string email, DateTime updatemaxpassword)
+        {
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "Update Account SET UpdateMaxPassword=@paraUpdateMaxPassword WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            command.Parameters.AddWithValue("@paraUpdateMaxPassword", updatemaxpassword);
+            connection.Open();
+            command.CommandText = sql;
+            command.Connection = connection;
+            int result = command.ExecuteNonQuery();
+            connection.Close();
+            return result;
+        }
+
+        protected string getmaxPassword(string email)
+        {
+            string s = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select UpdateMaxPassword FROM Account WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["UpdateMaxPassword"] != null)
+                        {
+                            if (reader["UpdateMaxPassword"] != DBNull.Value)
+                            {
+                                s = reader["UpdateMaxPassword"].ToString();
                             }
                         }
                     }
