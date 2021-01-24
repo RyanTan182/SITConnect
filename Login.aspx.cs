@@ -39,42 +39,49 @@ namespace SITConnect
             string dbHash = getDBHash(userid);
             string dbSalt = getDBSalt(userid);
             int dbcount = getFailedAttemptCount(userid);
-            int updatefailedattempt = updateLastFailedAttempt(userid, lastfailedattempt);
-            int updatecount = updateFailedAttemptCount(userid);
+            string checkemail = getEmail();
+
             try
             {
-                if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
+                if (ValidateCaptcha())
                 {
-                    string pwdWithSalt = pwd + dbSalt;
-                    byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-                    string userHash = Convert.ToBase64String(hashWithSalt);
-                    if (userHash.Equals(dbHash))
+                    if (checkemail != null)
                     {
-                        if (dbcount < 3)
+
+                        if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
                         {
-                            Session["LoggedIn"] = tb_email.Text.Trim();
-                            Session["SSEmail"] = tb_email.Text;
+                            string pwdWithSalt = pwd + dbSalt;
+                            byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
+                            string userHash = Convert.ToBase64String(hashWithSalt);
+                            if (userHash.Equals(dbHash))
+                            {
+                                if (dbcount < 3)
+                                {
+                                    Session["LoggedIn"] = tb_email.Text.Trim();
+                                    Session["SSEmail"] = tb_email.Text;
 
-                            string guid = Guid.NewGuid().ToString();
-                            Session["AuthToken"] = guid;
+                                    string guid = Guid.NewGuid().ToString();
+                                    Session["AuthToken"] = guid;
 
-                            resetFailedAttemptCount(userid);
-                            Response.Cookies.Add(new HttpCookie("AuthToken", guid));
-                            Response.Redirect("HomePage.aspx", false);
+                                    resetFailedAttemptCount(userid);
+                                    Response.Cookies.Add(new HttpCookie("AuthToken", guid));
+                                    Response.Redirect("HomePage.aspx", false);
+                                }
+                                else if (dbcount >= 3)
+                                {
+                                    errorMsg.Visible = true;
+                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please contact adminstrator.";
+                                }
+                            }
+                            else
+                            {
+                                errorMsg.Visible = true;
+                                errorMsg.Text = "Login Failed!";
+                                dbcount += 1;
+                                updateFailedAttemptCount(userid, dbcount);
+
+                            }
                         }
-                        else if (dbcount >= 3)
-                        {
-                            errorMsg.Visible = true;
-                            errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please contact adminstrator.";
-                        }
-                }
-                    else
-                    {
-                        errorMsg.Visible = true;
-                        errorMsg.Text = "Login Failed!";
-                        updatefailedattempt += 1;
-                        updatecount += 1;
-
                     }
                 }
             }
@@ -109,7 +116,6 @@ namespace SITConnect
                         string jsonResponse = readStream.ReadToEnd();
 
                         //To show the JSON response string for learning purpose
-                        lbl_gScore.Text = jsonResponse.ToString();
 
                         JavaScriptSerializer js = new JavaScriptSerializer();
 
@@ -194,6 +200,38 @@ namespace SITConnect
             finally { connection.Close(); }
             return s;
         }
+
+        protected string getEmail()
+        {
+            string s = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select Email FROM Account";
+            SqlCommand command = new SqlCommand(sql, connection);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["Email"] != null)
+                        {
+                            if (reader["Email"] != DBNull.Value)
+                            {
+                                s = reader["Email"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
+        }
+
         protected int getFailedAttemptCount(string email)
         {
             int g = 0;
@@ -226,13 +264,13 @@ namespace SITConnect
             return g;
         }
 
-        protected int updateFailedAttemptCount(string email)
+        protected int updateFailedAttemptCount(string email,int failedattemptcount)
         {
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
-            string sql = "Update Account SET FailedAttemptCount=FailedAttemptCount + 1 WHERE Email=@EMAIL";
+            string sql = "Update Account SET FailedAttemptCount=@ParaFailedAttemptCount WHERE Email=@EMAIL";
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@EMAIL", email);
-            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
             connection.Open();
             command.CommandText = sql;
             command.Connection = connection;
@@ -257,14 +295,13 @@ namespace SITConnect
             return result;
         }
 
-        protected int updateLastFailedAttempt(string email,string lastfailedattempt)
+        protected int updateLoginTime(string email,string updatelogintime)
         {
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
-            string sql = "Update Account SET LastFailedAttempt=@paraLastFailedAttempt WHERE Email=@EMAIL";
+            string sql = "Update Account SET UpdateLoginTime=@paraUpdateLoginTime WHERE Email=@EMAIL";
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@EMAIL", email);
-            command.Parameters.AddWithValue("@paraLastFailedAttempt", lastfailedattempt);
-            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            command.Parameters.AddWithValue("@paraUpdateLoginTime", updatelogintime);
             connection.Open();
             command.CommandText = sql;
             command.Connection = connection;

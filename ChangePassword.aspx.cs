@@ -90,7 +90,13 @@ namespace SITConnect
         protected void btn_submit_Click(object sender, EventArgs e)
         {
             int scores = checkPassword(tb_newpassword.Text);
-    
+            bool validInput = ValidateInput();
+            string oldpwd = tb_oldpassword.Text.ToString().Trim();
+            string email = lbl_email.Text.ToString().Trim();
+            SHA512Managed hashing = new SHA512Managed();
+            string dbHash = getDBHash(email);
+            string dbSalt = getDBSalt(email);
+
             string status = "";
             switch (scores)
             {
@@ -118,36 +124,147 @@ namespace SITConnect
                 lbl_pwdchecker.ForeColor = Color.Red;
                 return;
             }
-            lbl_pwdchecker.ForeColor = Color.Green;
-            string pwd = tb_newpassword.Text.ToString().Trim();
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            byte[] saltByte = new byte[8];
-            rng.GetBytes(saltByte);
-            newsalt = Convert.ToBase64String(saltByte);
-            SHA512Managed hashing = new SHA512Managed();
-            string pwdWithSalt = pwd + newsalt;
-            byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwd));
-            byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-            newfinalHash = Convert.ToBase64String(hashWithSalt);
-            UpdatePassword();
-            updateLastUpdatePassword(lbl_email.Text, lastupdatepassword);
-            Response.Redirect("HomePage.aspx");
+            if (validInput)
+            {
+                if (dbSalt != null && dbSalt.Length > 0 && dbHash != null && dbHash.Length > 0)
+                {
+                    string pwdWithSalt = oldpwd + dbSalt;
+                    byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
+                    string userHash = Convert.ToBase64String(hashWithSalt);
+                    if (userHash.Equals(dbHash))
+                    {
+
+                        lbl_pwdchecker.ForeColor = Color.Green;
+                        string newpwd = tb_newpassword.Text.ToString().Trim();
+                        RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                        byte[] newsaltByte = new byte[8];
+                        rng.GetBytes(newsaltByte);
+                        newsalt = Convert.ToBase64String(newsaltByte);
+                        SHA512Managed newhashing = new SHA512Managed();
+                        string newpwdWithSalt = newpwd + newsalt;
+                        byte[] plainHash = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwd));
+                        byte[] newhashWithSalt = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
+                        newfinalHash = Convert.ToBase64String(newhashWithSalt);
+                        UpdatePassword();
+                        updatePasswordTime(lbl_email.Text, DateTime.Now.AddMinutes(5), DateTime.Now.AddMinutes(15));
+                        Response.Redirect("HomePage.aspx");
+                    }
+                    else
+                    {
+                        errorMsg.Visible = true;
+                        errorMsg.Text = "Incorrect current password! Please try again!";
+                        errorMsg.ForeColor = Color.Red;
+                    }
+                }
+            }
         }
 
-        protected int updateLastUpdatePassword(string email, string lastupdatepassword)
+        protected int updatePasswordTime(string email, DateTime updateminpassword, DateTime updatemaxpassword)
         {
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
-            string sql = "Update Account SET LastUpdatePassword=@paraLastUpdatePassword WHERE Email=@EMAIL";
+            string sql = "Update Account SET UpdateMinPassword=@paraUpdateMinPassword, UpdateMaxPassword=@paraUpdateMaxPassword WHERE Email=@EMAIL";
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@EMAIL", email);
-            command.Parameters.AddWithValue("@paraLastUpdatePassword", lastupdatepassword);
-            //command.Parameters.AddWithValue("@ParaFailedAttemptCount", failedattemptcount);
+            command.Parameters.AddWithValue("@paraUpdateMinPassword", updateminpassword);
+            command.Parameters.AddWithValue("@paraUpdateMaxPassword", updatemaxpassword);
             connection.Open();
             command.CommandText = sql;
             command.Connection = connection;
             int result = command.ExecuteNonQuery();
             connection.Close();
             return result;
+        }
+        protected string getDBHash(string email)
+        {
+            string h = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select PasswordHash FROM Account WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+
+                    while (reader.Read())
+                    {
+                        if (reader["PasswordHash"] != null)
+                        {
+                            if (reader["PasswordHash"] != DBNull.Value)
+                            {
+                                h = reader["PasswordHash"].ToString();
+                            }
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return h;
+        }
+        protected string getDBSalt(string email)
+        {
+            string s = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select PasswordSalt FROM Account WHERE Email=@EMAIL";
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@EMAIL", email);
+            try
+            {
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["PASSWORDSALT"] != null)
+                        {
+                            if (reader["PASSWORDSALT"] != DBNull.Value)
+                            {
+                                s = reader["PASSWORDSALT"].ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
+        }
+
+        private bool ValidateInput()
+        {
+            errorMsg.Text = String.Empty;
+            errorMsg.ForeColor = Color.Red;
+
+            if (String.IsNullOrEmpty(tb_oldpassword.Text))
+            {
+                errorMsg.Text += "Please type in your current password!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_newpassword.Text))
+            {
+                errorMsg.Text += "Contact Number is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_newconfirmpassword.Text))
+            {
+                errorMsg.Text += "Password is required!" + "<br/>";
+            }
+
+            if (String.IsNullOrEmpty(errorMsg.Text))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

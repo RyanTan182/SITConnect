@@ -79,6 +79,21 @@
                     &nbsp;</td>
             </tr>
             <tr>
+                <td class="auto-style2">Current Password:</td>
+                <td class="auto-style1">
+                    <asp:TextBox ID="tb_oldpassword" runat="server" Width="212px" TextMode="Password"></asp:TextBox>
+                </td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    &nbsp;</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
                 <td class="auto-style2">New Password:</td>
                 <td class="auto-style1">
             <asp:TextBox ID="tb_newpassword" runat="server" Width="211px" onkeyup="javascript:validate()" TextMode="Password"></asp:TextBox>

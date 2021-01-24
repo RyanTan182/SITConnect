@@ -19,8 +19,9 @@ namespace SITConnect
 
         static string finalHash;
         static int failedattemptcount;
-        static Nullable<DateTime> lastfailedattempt;
-        static Nullable<DateTime> lastupdatepassword;
+        static Nullable<DateTime> updatelogintime;
+        static Nullable<DateTime> updateminpassword;
+        static Nullable<DateTime> updatemaxpassword;
         static string salt;
         byte[] Key;
         byte[] IV;
@@ -76,8 +77,9 @@ namespace SITConnect
             Key = cipher.Key;
             IV = cipher.IV;
             failedattemptcount = 0;
-            lastfailedattempt = null;
-            lastupdatepassword = null;
+            updatelogintime = null;
+            updateminpassword = null;
+            updatemaxpassword = null;
             createAccount();
             Response.Redirect("Login.aspx");
         }
@@ -122,7 +124,7 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @LastFailedAttempt, @LastUpdatePassword)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @DateOfBirth, @IV, @Key, @FailedAttemptCount, @UpdateLoginTime, @UpdateMinPassword, @UpdateMaxPassword)"))
                 {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
@@ -137,8 +139,9 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(IV));
                             cmd.Parameters.AddWithValue("@Key", Convert.ToBase64String(Key));
                             cmd.Parameters.AddWithValue("@FailedAttemptCount", failedattemptcount);
-                            cmd.Parameters.AddWithValue("@LastFailedAttempt", DBNull.Value);
-                            cmd.Parameters.AddWithValue("@LastUpdatePassword", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@UpdateLoginTime", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@UpdateMinPassword", DBNull.Value);
+                            cmd.Parameters.AddWithValue("@UpdateMaxPassword", DBNull.Value);
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();

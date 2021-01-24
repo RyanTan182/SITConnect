@@ -97,7 +97,7 @@
             <tr>
                 <td class="auto-style2">Credit Card Number</td>
                 <td class="auto-style1">
-                    <asp:TextBox ID="tb_creditcard" runat="server" Width="211px"></asp:TextBox>
+                    <asp:TextBox ID="tb_creditcard" runat="server" Width="211px" TextMode="Number"></asp:TextBox>
                 </td>
                 <td>
                     &nbsp;</td>
@@ -154,7 +154,7 @@
             <tr>
                 <td class="auto-style2">Date of Birth:</td>
                 <td class="auto-style1">
-                    <asp:TextBox ID="tb_dob" runat="server" Width="211px"></asp:TextBox>
+                    <asp:TextBox ID="tb_dob" runat="server" Width="211px" TextMode="Date"></asp:TextBox>
                 </td>
                 <td>&nbsp;</td>
             </tr>
