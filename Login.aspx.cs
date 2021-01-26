@@ -130,7 +130,7 @@ namespace SITConnect
                     {
 
                         errorMsg.Visible = true;
-                        errorMsg.Text = "Login Failed!";
+                        errorMsg.Text = "Login Failed! Email doesnt exist";
 
                     }
                 }

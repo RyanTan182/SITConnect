@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Configuration;
 
 namespace SITConnect
 {
@@ -40,20 +41,6 @@ namespace SITConnect
                 case 1:
                     status = "Very Weak";
                     break;
-                case 2:
-                    status = "Weak";
-                    break;
-                case 3:
-                    status = "Medium";
-                    break;
-                case 4:
-                    status = "Strong";
-                    break;
-                case 5:
-                    status = "Excellent";
-                    break;
-                default:
-                    break;
             }
             lbl_pwdchecker.Text = "Status : " + status;
             if (scores < 4)
@@ -61,27 +48,30 @@ namespace SITConnect
                 lbl_pwdchecker.ForeColor = Color.Red;
                 return;
             }
-            lbl_pwdchecker.ForeColor = Color.Green;
-            string pwd = tb_password.Text.ToString().Trim();
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            byte[] saltByte = new byte[8];
-            rng.GetBytes(saltByte);
-            salt = Convert.ToBase64String(saltByte);
-            SHA512Managed hashing = new SHA512Managed();
-            string pwdWithSalt = pwd + salt;
-            byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwd));
-            byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
-            finalHash = Convert.ToBase64String(hashWithSalt);
-            RijndaelManaged cipher = new RijndaelManaged();
-            cipher.GenerateKey();
-            Key = cipher.Key;
-            IV = cipher.IV;
-            failedattemptcount = 0;
-            updatelogintime = null;
-            updateminpassword = null;
-            updatemaxpassword = null;
-            createAccount();
-            Response.Redirect("Login.aspx");
+            if (ValidateInput())
+            {
+                lbl_pwdchecker.ForeColor = Color.Green;
+                string pwd = tb_password.Text.ToString().Trim();
+                RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                byte[] saltByte = new byte[8];
+                rng.GetBytes(saltByte);
+                salt = Convert.ToBase64String(saltByte);
+                SHA512Managed hashing = new SHA512Managed();
+                string pwdWithSalt = pwd + salt;
+                byte[] plainHash = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwd));
+                byte[] hashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdWithSalt));
+                finalHash = Convert.ToBase64String(hashWithSalt);
+                RijndaelManaged cipher = new RijndaelManaged();
+                cipher.GenerateKey();
+                Key = cipher.Key;
+                IV = cipher.IV;
+                failedattemptcount = 0;
+                updatelogintime = null;
+                updateminpassword = null;
+                updatemaxpassword = null;
+                createAccount();
+                Response.Redirect("Login.aspx");
+            }
         }
         private int checkPassword(string password)
         {
@@ -176,6 +166,106 @@ namespace SITConnect
             }
             finally { }
             return cipherText;
+        }
+
+        private bool ValidateInput()
+        {
+            errorMsg.Text = String.Empty;
+            errorMsg.ForeColor = Color.Red;
+            if (tb_email.Text == "")
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Email is required!" + "<br/>";
+            }
+            string emp = SelectByUsername(tb_email.Text);
+            if (emp != null)
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Email already exists!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_firstname.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "First Name is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_lastname.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Last name is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_creditcard.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Credit Card is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_dob.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Date of Birth is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_creditcard.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Credit Card is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_password.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Password is required!" + "<br/>";
+            }
+            if (String.IsNullOrEmpty(tb_confirmpassword.Text))
+            {
+                errorMsg.Visible = true;
+                errorMsg.Text += "Please confirm your password!" + "<br/>";
+            }
+
+            if (String.IsNullOrEmpty(errorMsg.Text))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public string SelectByUsername(string email)
+        {
+            //Step 1 -  Define a connection to the database by getting
+            //          the connection string from App.config
+            SqlConnection myConn = new SqlConnection(MYDBConnectionString);
+
+            //Step 2 -  Create a DataAdapter to retrieve data from the database table
+            string sqlStmt = "Select * from Account where Email=@paraEmail";
+            SqlDataAdapter da = new SqlDataAdapter(sqlStmt, myConn);
+            da.SelectCommand.Parameters.AddWithValue("@paraEmail", email);
+
+            //Step 3 -  Create a DataSet to store the data to be retrieved
+            DataSet ds = new DataSet();
+
+            //Step 4 -  Use the DataAdapter to fill the DataSet with data retrieved
+            da.Fill(ds);
+
+            //Step 5 -  Read data from DataSet.
+            string act = null;
+            int rec_cnt = ds.Tables[0].Rows.Count;
+            if (rec_cnt == 1)
+            {
+                DataRow row = ds.Tables[0].Rows[0];  // Sql command returns only one record
+                string firstname = row["FirstName"].ToString();
+                string lastname = row["LastName"].ToString();
+                string creditcard = row["CreditCard"].ToString();
+                string iv = row["IV"].ToString();
+                string key = row["Key"].ToString();
+                string dob = row["DateOfBirth"].ToString();
+                int failedattemptcount = Convert.ToInt32(row["FailedAttemptCount"]);
+                DateTime updatelogintime = Convert.ToDateTime(row["UpdateLoginTime"]);
+                DateTime updatemaxpassword = Convert.ToDateTime(row["UpdateMaxPassword"]);
+                DateTime updateminpassword = Convert.ToDateTime(row["UpdateMinPassword"]);
+                string passwordhash = row["PasswordHash"].ToString();
+                string passwordsalt = row["PasswordSalt"].ToString();
+            }
+            return act;
         }
     }
 }
