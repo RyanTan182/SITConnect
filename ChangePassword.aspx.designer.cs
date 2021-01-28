@@ -33,13 +33,13 @@ namespace SITConnect
         protected global::System.Web.UI.WebControls.Label lbl_email;
 
         /// <summary>
-        /// tb_oldpassword control.
+        /// tb_oldpass control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox tb_oldpassword;
+        protected global::System.Web.UI.WebControls.TextBox tb_oldpass;
 
         /// <summary>
         /// tb_newpassword control.

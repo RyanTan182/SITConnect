@@ -13,7 +13,8 @@ using System.Text;
 using System.Configuration;
 
 namespace SITConnect
-{
+{    
+
     public partial class Registration : System.Web.UI.Page
     {
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
@@ -34,20 +35,19 @@ namespace SITConnect
         {
             // implement codes for the button event
             // Extract data from textbox
-            int scores = checkPassword(tb_password.Text);
-            string status = "";
-            switch (scores)
-            {
-                case 1:
-                    status = "Very Weak";
-                    break;
-            }
-            lbl_pwdchecker.Text = "Status : " + status;
-            if (scores < 4)
-            {
-                lbl_pwdchecker.ForeColor = Color.Red;
-                return;
-            }
+            //string status = "";
+            //switch (scores)
+            //{
+            //    case 1:
+            //        status = "Very Weak";
+            //        break;
+            //}
+            //errorMsg.Text = "Status : " + status;
+            //if (scores < 4)
+            //{
+            //    errorMsg.ForeColor = Color.Red;
+            //    return;
+            //}
             if (ValidateInput())
             {
                 lbl_pwdchecker.ForeColor = Color.Green;
@@ -114,7 +114,7 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @IV, @Key, @DateOfBirth, @FailedAttemptCount, @UpdateLoginTime, @UpdateMinPassword, @UpdateMaxPassword)"))
+                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Account VALUES(@Email, @FirstName,@LastName, @CreditCard, @PasswordHash, @PasswordSalt, @IV, @Key, @DateOfBirth, @FailedAttemptCount, @UpdateLoginTime, @UpdateMinPassword, @UpdateMaxPassword, @PasswordAge1 , @PasswordAge2)"))
                 {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
@@ -132,6 +132,8 @@ namespace SITConnect
                             cmd.Parameters.AddWithValue("@UpdateLoginTime", DBNull.Value);
                             cmd.Parameters.AddWithValue("@UpdateMinPassword", DateTime.Now.AddMinutes(5));
                             cmd.Parameters.AddWithValue("@UpdateMaxPassword", DateTime.Now.AddMinutes(15));
+                            cmd.Parameters.AddWithValue("@PasswordAge1",DBNull.Value );
+                            cmd.Parameters.AddWithValue("@PasswordAge2", DBNull.Value);
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();
@@ -177,7 +179,7 @@ namespace SITConnect
                 errorMsg.Visible = true;
                 errorMsg.Text += "Email is required!" + "<br/>";
             }
-            string emp = SelectByUsername(tb_email.Text);
+            string emp = getEmail();
             if (emp != null)
             {
                 errorMsg.Visible = true;
@@ -218,6 +220,15 @@ namespace SITConnect
                 errorMsg.Visible = true;
                 errorMsg.Text += "Please confirm your password!" + "<br/>";
             }
+            if (tb_password.Text.ToString() != tb_confirmpassword.Text.ToString())
+            {
+                errorMsg.Text += "Password does not match! Please try again!" + "<br/>";
+            }
+            int scores = checkPassword(tb_password.Text);
+            if (scores < 4)
+            {
+                errorMsg.Text += "Password is too weak! Please try again!" + "<br/>:";
+            }
 
             if (String.IsNullOrEmpty(errorMsg.Text))
             {
@@ -229,43 +240,35 @@ namespace SITConnect
             }
         }
 
-        public string SelectByUsername(string email)
+        protected string getEmail()
         {
-            //Step 1 -  Define a connection to the database by getting
-            //          the connection string from App.config
-            SqlConnection myConn = new SqlConnection(MYDBConnectionString);
-
-            //Step 2 -  Create a DataAdapter to retrieve data from the database table
-            string sqlStmt = "Select * from Account where Email=@paraEmail";
-            SqlDataAdapter da = new SqlDataAdapter(sqlStmt, myConn);
-            da.SelectCommand.Parameters.AddWithValue("@paraEmail", email);
-
-            //Step 3 -  Create a DataSet to store the data to be retrieved
-            DataSet ds = new DataSet();
-
-            //Step 4 -  Use the DataAdapter to fill the DataSet with data retrieved
-            da.Fill(ds);
-
-            //Step 5 -  Read data from DataSet.
-            string act = null;
-            int rec_cnt = ds.Tables[0].Rows.Count;
-            if (rec_cnt == 1)
+            string s = null;
+            SqlConnection connection = new SqlConnection(MYDBConnectionString);
+            string sql = "select Email FROM Account";
+            SqlCommand command = new SqlCommand(sql, connection);
+            try
             {
-                DataRow row = ds.Tables[0].Rows[0];  // Sql command returns only one record
-                string firstname = row["FirstName"].ToString();
-                string lastname = row["LastName"].ToString();
-                string creditcard = row["CreditCard"].ToString();
-                string iv = row["IV"].ToString();
-                string key = row["Key"].ToString();
-                string dob = row["DateOfBirth"].ToString();
-                int failedattemptcount = Convert.ToInt32(row["FailedAttemptCount"]);
-                DateTime updatelogintime = Convert.ToDateTime(row["UpdateLoginTime"]);
-                DateTime updatemaxpassword = Convert.ToDateTime(row["UpdateMaxPassword"]);
-                DateTime updateminpassword = Convert.ToDateTime(row["UpdateMinPassword"]);
-                string passwordhash = row["PasswordHash"].ToString();
-                string passwordsalt = row["PasswordSalt"].ToString();
+                connection.Open();
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["Email"] != null)
+                        {
+                            if (reader["Email"] != DBNull.Value)
+                            {
+                                s = reader["Email"].ToString();
+                            }
+                        }
+                    }
+                }
             }
-            return act;
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            finally { connection.Close(); }
+            return s;
         }
     }
 }

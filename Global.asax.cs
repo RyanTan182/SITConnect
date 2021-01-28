@@ -11,6 +11,7 @@ namespace SITConnect
     {
         protected void Application_Start(object sender, EventArgs e)
         {
+            //HttpContext.Current.Response.AddHeader("X-Frame-Options", "DENY");
         }
     }
 }

@@ -113,7 +113,7 @@ namespace SITConnect
                             else if (dbcount == 2)
                             {
                                 int updatedattemptcount = dbcount + 1;
-                                updateLoginTime(userid, DateTime.Now.AddMinutes(15));
+                                updateLoginTime(userid, DateTime.Now.AddMinutes(1));
                                 updateFailedAttemptCount(userid, updatedattemptcount);
 
                             }
@@ -125,13 +125,13 @@ namespace SITConnect
                                 updateFailedAttemptCount(userid, dbcount);
                             }
                         }
-                    }
-                    else
-                    {
+                        else
+                        {
 
-                        errorMsg.Visible = true;
-                        errorMsg.Text = "Login Failed! Email doesnt exist";
+                            errorMsg.Visible = true;
+                            errorMsg.Text = "Login Failed! Email doesnt exist";
 
+                        }
                     }
                 }
             }

@@ -81,7 +81,7 @@
             <tr>
                 <td class="auto-style2">Current Password:</td>
                 <td class="auto-style1">
-                    <asp:TextBox ID="tb_oldpassword" runat="server" Width="212px" TextMode="Password"></asp:TextBox>
+                    <asp:TextBox ID="tb_oldpass" runat="server" Width="212px" TextMode="Password" ></asp:TextBox>
                 </td>
                 <td>
                     &nbsp;</td>
