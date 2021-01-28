@@ -30,14 +30,13 @@ namespace SITConnect
             {
                 using (SqlConnection con = new SqlConnection(MYDBConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("UPDATE Account SET passwordhash = @paraPasswordHash, passwordsalt= @paraPasswordSalt where email =  @paraEmail"))
+                    using (SqlCommand cmd = new SqlCommand("UPDATE Account SET passwordhash = @paraPasswordHash where email =  @paraEmail"))
                     {
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
                             cmd.CommandType = CommandType.Text;
                             cmd.Parameters.AddWithValue("@paraEmail", lbl_email.Text);
                             cmd.Parameters.AddWithValue("@paraPasswordHash", newfinalHash);
-                            cmd.Parameters.AddWithValue("@paraPasswordSalt", newsalt);
                             cmd.Connection = con;
                             con.Open();
                             cmd.ExecuteNonQuery();
@@ -136,28 +135,33 @@ namespace SITConnect
                     string userHash = Convert.ToBase64String(hashWithSalt);
                     if (userHash.Equals(dbHash))
                     {
-                        string pwdage1WithSalt = getPasswordAge1(email) + dbSalt;
-                        string pwdage2WithSalt = getPasswordAge2(email) + dbSalt;
-                        byte[] hashpass1WithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdage1WithSalt));
-                        byte[] hashpass2WithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdage2WithSalt));
-                        string userHash1 = Convert.ToBase64String(hashpass1WithSalt);
-                        string userHash2 = Convert.ToBase64String(hashpass2WithSalt);
+                        //string pwdage1WithSalt = getPasswordAge1(email) + dbSalt;
+                        //string pwdage2WithSalt = getPasswordAge2(email) + dbSalt;
+                        //byte[] hashpass1WithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdage1WithSalt));
+                        //byte[] hashpass2WithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(pwdage2WithSalt));
+                        //string userHash1 = Convert.ToBase64String(hashpass1WithSalt);
+                        //string userHash2 = Convert.ToBase64String(hashpass2WithSalt);
                         string currentnewpwdWithSalt = newcurrentpwd + dbSalt;
                         byte[] currentnewhashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(currentnewpwdWithSalt));
                         string currentnewuserHash = Convert.ToBase64String(currentnewhashWithSalt);
-
-                        if (currentnewuserHash!=userHash1)
+                        if (currentnewuserHash == passwordage1 || currentnewuserHash == passwordage2)
                         {
-                            if (currentnewuserHash != userHash2)
+                            errorMsg.Visible = true;
+                            errorMsg.Text = "Sorry! But you can't use the same password that was used in the last 2 generation! Please try again!";
+                            errorMsg.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            if (passwordage2 == null)
                             {
                                 lbl_pwdchecker.ForeColor = Color.Green;
                                 string newpwd = tb_newpassword.Text.ToString().Trim();
-                                RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-                                byte[] newsaltByte = new byte[8];
-                                rng.GetBytes(newsaltByte);
-                                newsalt = Convert.ToBase64String(newsaltByte);
+                                //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                                //byte[] newsaltByte = new byte[8];
+                                //rng.GetBytes(newsaltByte);
+                                //newsalt = Convert.ToBase64String(newsaltByte);
                                 SHA512Managed newhashing = new SHA512Managed();
-                                string newpwdWithSalt = newpwd + newsalt;
+                                string newpwdWithSalt = newpwd + dbSalt;
                                 byte[] plainHash = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwd));
                                 byte[] newhashWithSalt = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
                                 newfinalHash = Convert.ToBase64String(newhashWithSalt);
@@ -168,27 +172,45 @@ namespace SITConnect
                             }
                             else
                             {
-                                lbl_pwdchecker.ForeColor = Color.Green;
-                                string newpwd = tb_newpassword.Text.ToString().Trim();
-                                RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-                                byte[] newsaltByte = new byte[8];
-                                rng.GetBytes(newsaltByte);
-                                newsalt = Convert.ToBase64String(newsaltByte);
-                                SHA512Managed newhashing = new SHA512Managed();
-                                string newpwdWithSalt = newpwd + newsalt;
-                                byte[] plainHash = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwd));
-                                byte[] newhashWithSalt = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
-                                newfinalHash = Convert.ToBase64String(newhashWithSalt);
-                                UpdatePassword();
-                                updatePasswordTime(lbl_email.Text, DateTime.Now.AddMinutes(5), DateTime.Now.AddMinutes(15));
-                                updatePasswordAge1(lbl_email.Text, passwordage2);
-                                updatePasswordAge2(lbl_email.Text, newfinalHash);
-                                Response.Redirect("HomePage.aspx");
+                                if (passwordage1 == null)
+                                {
+                                    lbl_pwdchecker.ForeColor = Color.Green;
+                                    string newpwd = tb_newpassword.Text.ToString().Trim();
+                                    //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                                    //byte[] newsaltByte = new byte[8];
+                                    //rng.GetBytes(newsaltByte);
+                                    //newsalt = Convert.ToBase64String(newsaltByte);
+                                    SHA512Managed newhashing = new SHA512Managed();
+                                    string newpwdWithSalt = newpwd + dbSalt;
+                                    byte[] plainHash = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwd));
+                                    byte[] newhashWithSalt = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
+                                    newfinalHash = Convert.ToBase64String(newhashWithSalt);
+                                    UpdatePassword();
+                                    updatePasswordTime(lbl_email.Text, DateTime.Now.AddMinutes(5), DateTime.Now.AddMinutes(15));
+                                    updatePasswordAge1(lbl_email.Text, passwordage2);
+                                    updatePasswordAge2(lbl_email.Text, dbHash);
+                                    Response.Redirect("HomePage.aspx");
+                                }
+                                else
+                                {
+                                    lbl_pwdchecker.ForeColor = Color.Green;
+                                    string newpwd = tb_newpassword.Text.ToString().Trim();
+                                    //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+                                    //byte[] newsaltByte = new byte[8];
+                                    //rng.GetBytes(newsaltByte);
+                                    //newsalt = Convert.ToBase64String(newsaltByte);
+                                    SHA512Managed newhashing = new SHA512Managed();
+                                    string newpwdWithSalt = newpwd + dbSalt;
+                                    byte[] plainHash = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwd));
+                                    byte[] newhashWithSalt = newhashing.ComputeHash(Encoding.UTF8.GetBytes(newpwdWithSalt));
+                                    newfinalHash = Convert.ToBase64String(newhashWithSalt);
+                                    UpdatePassword();
+                                    updatePasswordTime(lbl_email.Text, DateTime.Now.AddMinutes(5), DateTime.Now.AddMinutes(15));
+                                    updatePasswordAge1(lbl_email.Text, passwordage2);
+                                    updatePasswordAge2(lbl_email.Text, dbHash);
+                                    Response.Redirect("HomePage.aspx");
+                                }
                             }
-                        }
-                        else
-                        {
-                            errorMsg.Text = "Sorry! But Please use a different password that is not used in the last 2 generation";
                         }
                     }
                     else

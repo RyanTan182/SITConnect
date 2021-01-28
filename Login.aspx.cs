@@ -127,11 +127,14 @@ namespace SITConnect
                         }
                         else
                         {
-
                             errorMsg.Visible = true;
                             errorMsg.Text = "Login Failed! Email doesnt exist";
-
                         }
+                    }
+                    else
+                    {
+                        errorMsg.Visible = true;
+                        errorMsg.Text = "Login Failed! Email doesnt exist";
                     }
                 }
             }
