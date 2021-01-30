@@ -24,6 +24,15 @@ namespace SITConnect
         protected global::System.Web.UI.HtmlControls.HtmlForm form1;
 
         /// <summary>
+        /// errorMsg control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label errorMsg;
+
+        /// <summary>
         /// tb_firstname control.
         /// </summary>
         /// <remarks>
@@ -105,12 +114,12 @@ namespace SITConnect
         protected global::System.Web.UI.WebControls.Button btn_submit;
 
         /// <summary>
-        /// errorMsg control.
+        /// btn_login control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label errorMsg;
+        protected global::System.Web.UI.WebControls.Button btn_login;
     }
 }

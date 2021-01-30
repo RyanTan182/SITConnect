@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="SITConnect.Login" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Login.aspx.cs" Inherits="SITConnect.Login" ValidateRequest="false" %>
 
 <!DOCTYPE html>
 
@@ -8,17 +8,23 @@
     <script src="https://www.google.com/recaptcha/api.js?render=6LdO-RMaAAAAAGQWXKlrinaL-IVzRnEliyV7MTJE"></script>
     <style type="text/css">
         .auto-style1 {
-            width: 238px;
+            width: 138px;
         }
         .auto-style2 {
-            width: 115px;
+            width: 25px;
+        }
+        .auto-style3 {
+            margin-left: 0;
         }
     </style>
+    <link href="Content/Login.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+    <div class="loginpage">
     <form id="form1" runat="server">
+        <div class="form">
         <div id="container">
-            <strong>Login </strong>
+            <strong>&nbsp;Login </strong>
             <br />
         </div>
        
@@ -32,7 +38,14 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Email Address:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    Email Address:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <asp:TextBox ID="tb_email" runat="server" Width="211px" TextMode="Email"></asp:TextBox>
                 </td>
@@ -47,7 +60,14 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Password:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    Password:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <asp:TextBox ID="tb_password" runat="server" Width="211px" TextMode="Password"></asp:TextBox>
                 </td>
@@ -62,7 +82,7 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Verification:</td>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response"/>
                 </td>
@@ -72,24 +92,23 @@
             <tr>
                 <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
-                    <asp:Button ID="btn_submit" runat="server" Text="Submit" Width="222px" OnClick="btn_submit_Click" />
+                    <asp:Button ID="btn_submit" runat="server" Text="Submit" Width="206px" OnClick="btn_submit_Click" CssClass="auto-style3" />
                 </td>
-                <td>
-                    <asp:Button ID="btn_register" runat="server" Text="Register" Width="222px" OnClick="btn_register_Click" />
-                </td>
-            </tr>
-            <tr>
-                <td class="auto-style2">&nbsp;</td>
-                <td class="auto-style1">
-                    &nbsp;</td>
                 <td>
                     &nbsp;</td>
             </tr>
             <tr>
                 <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
-                    <asp:Button ID="btn_forgotpassword" runat="server" Text="Forgot Password" Width="222px" OnClick="btn_forgot_Click" />
+                    <asp:Button ID="btn_register" runat="server" Text="Register" Width="205px" OnClick="btn_register_Click" />
                 </td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    &nbsp;</td>
                 <td>
                     &nbsp;</td>
             </tr>
@@ -127,5 +146,7 @@
                 });
             });
         </script>
+        </div>
+    </div>
 </body>
 </html>

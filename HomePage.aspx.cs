@@ -10,9 +10,6 @@ namespace SITConnect
 {
     public partial class HomePage : System.Web.UI.Page
     {
-        static String lockStatus;
-        static int attemptcount = 0;
-        string lastfailedattempt = DateTime.Now.ToString();
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -23,7 +20,7 @@ namespace SITConnect
                     Response.Redirect("Login.aspx", true);
                 }
                 else
-                {
+                {   
                     lblMsg.Text = "Congratulations!, you are logged in.";
                     lblMsg.ForeColor = System.Drawing.Color.Green;
                     btn_logout.Visible = true;

@@ -1,9 +1,10 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ChangePassword.aspx.cs" Inherits="SITConnect.ChangePassword" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ChangePassword.aspx.cs" Inherits="SITConnect.ChangePassword" ValidateRequest="false" %>
 
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+    <link href="Content/ChangePassword.css" rel="stylesheet" type="text/css" />
     <title>My Registration</title>
     <script type="text/javascript">
         function validate() {
@@ -44,12 +45,14 @@
             width: 221px;
         }
         .auto-style2 {
-            width: 122px;
+            width: 27px;
         }
     </style>
 </head>
 <body>
+    <div class="loginpage">
     <form id="form1" runat="server">
+        <div class="form">
         <div id="container">
             <strong>Change Password</strong><br />
         </div>
@@ -64,7 +67,21 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Email:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    &nbsp;</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    Your Email:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <asp:Label ID="lbl_email" runat="server" Text=""></asp:Label>
                 </td>
@@ -79,7 +96,14 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Current Password:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    Current Password:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <asp:TextBox ID="tb_oldpass" runat="server" Width="212px" TextMode="Password" ></asp:TextBox>
                 </td>
@@ -94,13 +118,27 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">New Password:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    New Password:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
             <asp:TextBox ID="tb_newpassword" runat="server" Width="211px" onkeyup="javascript:validate()" TextMode="Password"></asp:TextBox>
                 </td>
                 <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
             <asp:Label ID="lbl_pwdchecker" runat="server" Text="pwdchecker"></asp:Label>
                 </td>
+                <td>
+                    &nbsp;</td>
             </tr>
             <tr>
                 <td class="auto-style2">&nbsp;</td>
@@ -110,7 +148,14 @@
                     &nbsp;</td>
             </tr>
             <tr>
-                <td class="auto-style2">Confirm New Password:</td>
+                <td class="auto-style2">&nbsp;</td>
+                <td class="auto-style1">
+                    Confirm New Password:</td>
+                <td>
+                    &nbsp;</td>
+            </tr>
+            <tr>
+                <td class="auto-style2">&nbsp;</td>
                 <td class="auto-style1">
                     <asp:TextBox ID="tb_newconfirmpassword" runat="server" Width="212px" TextMode="Password"></asp:TextBox>
                 </td>
@@ -156,7 +201,8 @@
             </tr>
             </table>
        
-
+            </div>
     </form>
+        </div>
 </body>
 </html>

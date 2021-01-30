@@ -51,7 +51,7 @@ namespace SITConnect
             if (ValidateInput())
             {
                 lbl_pwdchecker.ForeColor = Color.Green;
-                string pwd = tb_password.Text.ToString().Trim();
+                string pwd =HttpUtility.HtmlEncode(tb_password.Text.ToString().Trim());
                 RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                 byte[] saltByte = new byte[8];
                 rng.GetBytes(saltByte);
@@ -119,13 +119,13 @@ namespace SITConnect
                         using (SqlDataAdapter sda = new SqlDataAdapter())
                         {
                             cmd.CommandType = CommandType.Text;
-                            cmd.Parameters.AddWithValue("@FirstName", tb_firstname.Text.Trim());
-                            cmd.Parameters.AddWithValue("@LastName", tb_lastname.Text.Trim());
-                            cmd.Parameters.AddWithValue("@CreditCard", encryptData(tb_creditcard.Text.Trim()));
-                            cmd.Parameters.AddWithValue("@Email", tb_email.Text.Trim());
+                            cmd.Parameters.AddWithValue("@FirstName", HttpUtility.HtmlEncode(tb_firstname.Text.Trim()));
+                            cmd.Parameters.AddWithValue("@LastName", HttpUtility.HtmlEncode(tb_lastname.Text.Trim()));
+                            cmd.Parameters.AddWithValue("@CreditCard", encryptData(HttpUtility.HtmlEncode(tb_creditcard.Text.Trim())));
+                            cmd.Parameters.AddWithValue("@Email", HttpUtility.HtmlEncode(tb_email.Text.Trim()));
                             cmd.Parameters.AddWithValue("@PasswordHash", finalHash);
                             cmd.Parameters.AddWithValue("@PasswordSalt", salt);
-                            cmd.Parameters.AddWithValue("@DateOfBirth", tb_dob.Text.Trim());
+                            cmd.Parameters.AddWithValue("@DateOfBirth",HttpUtility.HtmlEncode( tb_dob.Text.Trim()));
                             cmd.Parameters.AddWithValue("@IV", Convert.ToBase64String(IV));
                             cmd.Parameters.AddWithValue("@Key", Convert.ToBase64String(Key));
                             cmd.Parameters.AddWithValue("@FailedAttemptCount", failedattemptcount);
@@ -179,7 +179,7 @@ namespace SITConnect
                 errorMsg.Visible = true;
                 errorMsg.Text += "Email is required!" + "<br/>";
             }
-            string emp = getEmail();
+            string emp = getEmail(tb_email.Text);
             if (emp != null)
             {
                 errorMsg.Visible = true;
@@ -240,12 +240,13 @@ namespace SITConnect
             }
         }
 
-        protected string getEmail()
+        protected string getEmail(string email)
         {
             string s = null;
             SqlConnection connection = new SqlConnection(MYDBConnectionString);
-            string sql = "select Email FROM Account";
+            string sql = "select Email FROM Account where Email=@paraEmail";
             SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@paraEmail", email);
             try
             {
                 connection.Open();
@@ -269,6 +270,11 @@ namespace SITConnect
             }
             finally { connection.Close(); }
             return s;
+        }
+
+        protected void btn_login_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("Login.aspx");
         }
     }
 }

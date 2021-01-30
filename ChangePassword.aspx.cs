@@ -90,8 +90,8 @@ namespace SITConnect
         {
             
             bool validInput = ValidateInput();
-            string oldpwd = tb_oldpass.Text.ToString().Trim();
-            string newcurrentpwd = tb_newpassword.Text.ToString().Trim();
+            string oldpwd = HttpUtility.HtmlEncode(tb_oldpass.Text.ToString().Trim());
+            string newcurrentpwd = HttpUtility.HtmlEncode(tb_newpassword.Text.ToString().Trim());
             string email = lbl_email.Text.ToString().Trim();
             SHA512Managed hashing = new SHA512Managed();
             string dbHash = getDBHash(email);
@@ -144,7 +144,7 @@ namespace SITConnect
                         string currentnewpwdWithSalt = newcurrentpwd + dbSalt;
                         byte[] currentnewhashWithSalt = hashing.ComputeHash(Encoding.UTF8.GetBytes(currentnewpwdWithSalt));
                         string currentnewuserHash = Convert.ToBase64String(currentnewhashWithSalt);
-                        if (currentnewuserHash == passwordage1 || currentnewuserHash == passwordage2)
+                        if (currentnewuserHash == passwordage1 || currentnewuserHash == passwordage2 ||currentnewuserHash==dbHash)
                         {
                             errorMsg.Visible = true;
                             errorMsg.Text = "Sorry! But you can't use the same password that was used in the last 2 generation! Please try again!";
@@ -155,7 +155,7 @@ namespace SITConnect
                             if (passwordage2 == null)
                             {
                                 lbl_pwdchecker.ForeColor = Color.Green;
-                                string newpwd = tb_newpassword.Text.ToString().Trim();
+                                string newpwd =HttpUtility.HtmlEncode( tb_newpassword.Text.ToString().Trim());
                                 //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                                 //byte[] newsaltByte = new byte[8];
                                 //rng.GetBytes(newsaltByte);
@@ -175,7 +175,7 @@ namespace SITConnect
                                 if (passwordage1 == null)
                                 {
                                     lbl_pwdchecker.ForeColor = Color.Green;
-                                    string newpwd = tb_newpassword.Text.ToString().Trim();
+                                    string newpwd = HttpUtility.HtmlEncode(tb_newpassword.Text.ToString().Trim());
                                     //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                                     //byte[] newsaltByte = new byte[8];
                                     //rng.GetBytes(newsaltByte);
@@ -194,7 +194,7 @@ namespace SITConnect
                                 else
                                 {
                                     lbl_pwdchecker.ForeColor = Color.Green;
-                                    string newpwd = tb_newpassword.Text.ToString().Trim();
+                                    string newpwd = HttpUtility.HtmlEncode(tb_newpassword.Text.ToString().Trim());
                                     //RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
                                     //byte[] newsaltByte = new byte[8];
                                     //rng.GetBytes(newsaltByte);

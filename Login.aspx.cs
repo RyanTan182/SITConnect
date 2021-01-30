@@ -11,14 +11,12 @@ using System.Net;
 using System.IO;
 using System.Web.Script.Serialization;
 using System.Web.Services;
+using System.Drawing;
 
 namespace SITConnect
 {
     public partial class Login : System.Web.UI.Page
     {
-        static String lockStatus;
-        static int attemptcount = 0;
-        string lastfailedattempt = DateTime.Now.ToString();
         string MYDBConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["SITConnect"].ConnectionString;
         public class MyObject
         {
@@ -33,8 +31,8 @@ namespace SITConnect
 
         protected void btn_submit_Click(object sender, EventArgs e)
         {
-            string pwd = tb_password.Text.ToString().Trim();
-            string userid = tb_email.Text.ToString().Trim();
+            string pwd = HttpUtility.HtmlEncode(tb_password.Text.ToString().Trim());
+            string userid = HttpUtility.HtmlEncode(tb_email.Text.ToString().Trim());
             SHA512Managed hashing = new SHA512Managed();
             string dbHash = getDBHash(userid);
             string dbSalt = getDBSalt(userid);
@@ -58,13 +56,15 @@ namespace SITConnect
                                 DateTime unlockedtime = Convert.ToDateTime(getDateTime(userid));
                                 if (DateTime.Now < unlockedtime)
                                 {
+                                    errorMsg.ForeColor = Color.Red;
                                     errorMsg.Visible = true;
-                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please refresh and try again in 15 minutes.";
+                                    errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please refresh and try again in 1 minute.";
                                 }
                                 else if (DateTime.Now > unlockedtime)
                                 {
                                     resetFailedAttemptCount(userid);
                                     updateLoginTime(userid, DateTime.Now);
+                                    errorMsg.ForeColor = Color.Red;
                                     errorMsg.Visible = true;
                                     errorMsg.Text = "Sorry for the wait! Your account has been automatically unlocked! Please try logging in again now";
                                 }
@@ -77,8 +77,8 @@ namespace SITConnect
                                 {
                                     if (DateTime.Now > maxpassword )
                                     {
-                                        Session["LoggedIn"] = tb_email.Text.Trim();
-                                        Session["SSEmail"] = tb_email.Text;
+                                        Session["LoggedIn"] = userid;
+                                        Session["SSEmail"] = userid;
 
                                         string guid = Guid.NewGuid().ToString();
                                         Session["AuthToken"] = guid;
@@ -91,8 +91,8 @@ namespace SITConnect
                                     }
                                     else
                                     {
-                                        Session["LoggedIn"] = tb_email.Text.Trim();
-                                        Session["SSEmail"] = tb_email.Text;
+                                        Session["LoggedIn"] = userid;
+                                        Session["SSEmail"] = userid;
 
                                         string guid = Guid.NewGuid().ToString();
                                         Session["AuthToken"] = guid;
@@ -106,11 +106,12 @@ namespace SITConnect
                                 }
                                 else if (dbcount >= 3)
                                 {
+                                    errorMsg.ForeColor = Color.Red;
                                     errorMsg.Visible = true;
                                     errorMsg.Text = "Your Account has been locked out due to many failed login attempts just now. Please contact adminstrator.";
                                 }
                             }
-                            else if (dbcount == 2)
+                            else if (dbcount == 2)          
                             {
                                 int updatedattemptcount = dbcount + 1;
                                 updateLoginTime(userid, DateTime.Now.AddMinutes(1));
@@ -127,12 +128,14 @@ namespace SITConnect
                         }
                         else
                         {
+                            errorMsg.ForeColor = Color.Red;
                             errorMsg.Visible = true;
                             errorMsg.Text = "Login Failed! Email doesnt exist";
                         }
                     }
                     else
                     {
+                        errorMsg.ForeColor = Color.Red;
                         errorMsg.Visible = true;
                         errorMsg.Text = "Login Failed! Email doesnt exist";
                     }
@@ -493,9 +496,5 @@ namespace SITConnect
             Response.Redirect("Registration.aspx");
         }
 
-        protected void btn_forgot_Click(object sender, EventArgs e)
-        {
-            Response.Redirect("ForgotPassword.aspx");
-        }
     }
 }
